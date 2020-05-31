@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="1.15.2">
+    <output-path>D:/server/minecraft/Spigot/1.15.2/plugins/</output-path>
+    <root id="archive" name="EmUtils-1.15.2.jar">
+      <element id="module-output" name="EmUtils" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/de/themoep/inventorygui/1.4.1-SNAPSHOT/inventorygui-1.4.1-SNAPSHOT.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
