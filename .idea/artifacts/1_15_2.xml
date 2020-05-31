@@ -4,6 +4,8 @@
     <root id="archive" name="EmUtils-1.15.2.jar">
       <element id="module-output" name="EmUtils" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/de/themoep/inventorygui/1.4.1-SNAPSHOT/inventorygui-1.4.1-SNAPSHOT.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/de/tr7zw/functional-annotations/0.1-SNAPSHOT/functional-annotations-0.1-20200118.161020-5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/de/tr7zw/item-nbt-api/2.3.1/item-nbt-api-2.3.1.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

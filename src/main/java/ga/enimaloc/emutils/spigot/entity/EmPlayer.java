@@ -3,6 +3,7 @@ package ga.enimaloc.emutils.spigot.entity;
 import ga.enimaloc.emutils.spigot.Constant;
 import ga.enimaloc.emutils.spigot.utils.WebUtils;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ public class EmPlayer {
     private boolean premium;
     private Map<Material, Integer> minedBlocks;
 
-    EmPlayer(Player player) {
+    EmPlayer(OfflinePlayer player) {
         this.uuid = player.getUniqueId();
         this.minedBlocks = new HashMap<>();
         try {
@@ -27,7 +28,7 @@ public class EmPlayer {
         }
     }
 
-    public static EmPlayer get(Player player) {
+    public static EmPlayer get(OfflinePlayer player) {
         if (!Constant.emPlayers.containsKey(player.getUniqueId()))
             Constant.emPlayers.put(player.getUniqueId(), new EmPlayer(player));
         return Constant.emPlayers.get(player.getUniqueId());

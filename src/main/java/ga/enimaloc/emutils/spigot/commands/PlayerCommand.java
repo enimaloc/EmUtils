@@ -7,18 +7,20 @@ import ga.enimaloc.emutils.spigot.Constant;
 import ga.enimaloc.emutils.spigot.EmUtils;
 import ga.enimaloc.emutils.spigot.entity.EmPlayer;
 import ga.enimaloc.emutils.spigot.entity.Lang;
+import ga.enimaloc.emutils.spigot.utils.MenuUtils;
 import ga.enimaloc.emutils.spigot.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Date;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class PlayerCommand implements CommandExecutor {
 
@@ -28,9 +30,14 @@ public class PlayerCommand implements CommandExecutor {
             sender.sendMessage(Constant.prefix+ Lang.getFromString("en").get("error.need_player"));
             return true;
         }
-        if (args.length == 0) return false;
         Player player = (Player) sender;
-        Player target = Bukkit.getPlayer(args[0]);
+        if(args.length == 0) MenuUtils.selectPlayer(player, targetIS->{
+            display(player, Bukkit.getPlayer(targetIS.getItemMeta().getDisplayName())); return true;});
+        else display(player, Bukkit.getPlayer(args[0]));
+        return true;
+    }
+
+    private void display(Player player, Player target) {
         EmPlayer emTarget = EmPlayer.get(target);
         Lang lang = Lang.getFromString(player.getLocale().split("_")[0]);
 
@@ -56,7 +63,7 @@ public class PlayerCommand implements CommandExecutor {
                         new StaticGuiElement(
                                 'g', new ItemStack(Material.PAPER),
                                 lang.get("inventory.player_info.general_info"),
-                                lang.get("inventory.player_info.general_info.hostname", target.getAddress().getHostName()),
+                                lang.get("inventory.player_info.general_info.hostname", target.getAddress().getAddress().getHostAddress()),
                                 lang.get("inventory.player_info.general_info.locale", target.getLocale()),
                                 lang.get("inventory.player_info.general_info.first_played", StringUtils.getFormattedDate(target.getFirstPlayed())),
                                 lang.get("inventory.player_info.general_info.premium", lang.get(""+emTarget.isPremium())),
@@ -95,8 +102,6 @@ public class PlayerCommand implements CommandExecutor {
                 gui.draw();
             }
         }.runTaskTimer(EmUtils.instance, 0L, 1L);
-
-        return true;
     }
 
 }
