@@ -31,7 +31,14 @@ public enum Lang {
             new String[]{"inventory.player_info.life_stats", "Life Stats:"},
             new String[]{"inventory.player_info.life_stats.health", "Health: %s"},
             new String[]{"inventory.player_info.life_stats.food", "Food: %s"},
-            new String[]{"inventory.player_info.life_stats.saturation", "Saturation: %s"}
+            new String[]{"inventory.player_info.life_stats.saturation", "Saturation: %s"},
+
+            new String[]{"inventory.player_info.mined_block", "Mined block"},
+            new String[]{"inventory.player_info.mined_block.total", "Total: %s"},
+
+
+            new String[]{"inventory.mined_block", "mined block of %s"},
+            new String[]{"inventory.mined_block.count", "Count: %s"}
     ),
     FR(
             new String[]{"true", "Oui"},

@@ -2,6 +2,7 @@ package ga.enimaloc.emutils.spigot;
 
 import ga.enimaloc.emutils.spigot.commands.PlayerCommand;
 import ga.enimaloc.emutils.spigot.listener.PlayerListener;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -17,6 +18,8 @@ public class EmUtils extends JavaPlugin {
         instance = this;
         BUNGEE = getServer().spigot().getConfig().getConfigurationSection("settings").getBoolean("settings.bungeecord");
         this.saveDefaultConfig();
+
+        Bukkit.getConsoleSender().sendMessage("éé");
 
         this.getCommand("player").setExecutor(new PlayerCommand());
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);

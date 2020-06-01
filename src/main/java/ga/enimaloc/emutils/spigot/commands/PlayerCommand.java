@@ -1,8 +1,6 @@
 package ga.enimaloc.emutils.spigot.commands;
 
-import de.themoep.inventorygui.DynamicGuiElement;
-import de.themoep.inventorygui.InventoryGui;
-import de.themoep.inventorygui.StaticGuiElement;
+import de.themoep.inventorygui.*;
 import ga.enimaloc.emutils.spigot.Constant;
 import ga.enimaloc.emutils.spigot.EmUtils;
 import ga.enimaloc.emutils.spigot.entity.EmPlayer;
@@ -20,6 +18,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class PlayerCommand implements CommandExecutor {
@@ -41,7 +41,10 @@ public class PlayerCommand implements CommandExecutor {
         EmPlayer emTarget = EmPlayer.get(target);
         Lang lang = Lang.getFromString(player.getLocale().split("_")[0]);
 
-        InventoryGui gui = new InventoryGui(
+        InventoryGui gui;
+        final InventoryGui[] minedBlock = new InventoryGui[1];
+
+        gui = new InventoryGui(
                 EmUtils.instance,
                 lang.get("inventory.player_info", target.getDisplayName()),
                 new String[]{
@@ -93,13 +96,57 @@ public class PlayerCommand implements CommandExecutor {
                 )
         );
 
+        gui.addElement(new DynamicGuiElement('j', () ->
+                        new StaticGuiElement(
+                                'i', new ItemStack(Material.DIAMOND_PICKAXE),
+                                click -> {
+                                    minedBlock[0] = new InventoryGui(
+                                            EmUtils.instance,
+                                            lang.get("inventory.mined_block", target.getDisplayName()),
+                                            new String[]{
+                                                    "aaaaaaaaa",
+                                                    "aaaaaaaaa",
+                                                    "aaaaaaaaa",
+                                                    "aaaaaaaaa",
+                                                    "aaaaaaaaa",
+                                                    "b       c",
+                                            }
+                                    );
+                                    List<GuiElement> elements = new ArrayList<>();
+                                    for (Material m : emTarget.getSortedMinedBlocks().keySet()) {
+                                        elements.add(
+                                                new DynamicGuiElement(
+                                                        'a',
+                                                        () -> new StaticGuiElement(
+                                                                'a',
+                                                                new ItemStack(m),
+                                                                "",
+                                                                lang.get("inventory.mined_block.count", emTarget.getMinedBlockCount(m))
+                                                        )
+                                                )
+                                        );
+                                    }
+                                    minedBlock[0].addElement(new GuiElementGroup('a', elements.toArray(new GuiElement[0])));
+                                    minedBlock[0].show(player);
+
+                                    return true;
+                                },
+                                lang.get("inventory.player_info.mined_block"),
+                                lang.get("inventory.player_info.mined_block.total", emTarget.getMinedBlocks().values().stream().mapToInt(Integer::intValue).sum())
+                        )
+                )
+        );
+
         gui.setFiller(new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         gui.show(player);
 
         new BukkitRunnable(){
             @Override
             public void run(){
-                gui.draw();
+                if (player.getOpenInventory().getTitle().equals(gui.getTitle()))
+                    gui.draw();
+                else if (minedBlock[0] != null && player.getOpenInventory().getTitle().equals(minedBlock[0].getTitle()))
+                    minedBlock[0].draw();
             }
         }.runTaskTimer(EmUtils.instance, 0L, 1L);
     }

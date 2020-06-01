@@ -7,9 +7,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class EmPlayer {
 
@@ -54,5 +53,36 @@ public class EmPlayer {
 
     public int getMinedBlockCount(Material material) {
         return minedBlocks.getOrDefault(material, 0);
+    }
+
+    // https://mkyong.com/java/how-to-sort-a-map-in-java/
+    public Map<Material, Integer> getSortedMinedBlocks() {
+        // 1. Convert Map to List of Map
+        List<Map.Entry<Material, Integer>> list =
+                new LinkedList<Map.Entry<Material, Integer>>(getMinedBlocks().entrySet());
+
+        // 2. Sort list with Collections.sort(), provide a custom Comparator
+        //    Try switch the o1 o2 position for a different order
+        Collections.sort(list, new Comparator<Map.Entry<Material, Integer>>() {
+            public int compare(Map.Entry<Material, Integer> o1,
+                               Map.Entry<Material, Integer> o2) {
+                return (o2.getValue()).compareTo(o1.getValue());
+            }
+        });
+
+        // 3. Loop the sorted list and put it into a new insertion order Map LinkedHashMap
+        Map<Material, Integer> sortedMap = new LinkedHashMap<Material, Integer>();
+        for (Map.Entry<Material, Integer> entry : list) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+
+        /*
+        //classic iterator example
+        for (Iterator<Map.Entry<String, Integer>> it = list.iterator(); it.hasNext(); ) {
+            Map.Entry<String, Integer> entry = it.next();
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }*/
+
+        return sortedMap;
     }
 }
