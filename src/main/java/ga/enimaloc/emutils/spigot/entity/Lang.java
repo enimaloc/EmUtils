@@ -37,7 +37,7 @@ public enum Lang {
             new String[]{"inventory.player_info.mined_block.total", "Total: %s"},
 
 
-            new String[]{"inventory.mined_block", "mined block of %s"},
+            new String[]{"inventory.mined_block", "List of mined block of %s"},
             new String[]{"inventory.mined_block.count", "Count: %s"}
     ),
     FR(
@@ -64,7 +64,14 @@ public enum Lang {
             new String[]{"inventory.player_info.life_stats", "Statistique de vie:"},
             new String[]{"inventory.player_info.life_stats.health", "Vie: %s"},
             new String[]{"inventory.player_info.life_stats.food", "Nourriture: %s"},
-            new String[]{"inventory.player_info.life_stats.saturation", "Saturation: %s"}
+            new String[]{"inventory.player_info.life_stats.saturation", "Saturation: %s"},
+
+            new String[]{"inventory.player_info.mined_block", "Blocs minés"},
+            new String[]{"inventory.player_info.mined_block.total", "Total: %s"},
+
+
+            new String[]{"inventory.mined_block", "Liste de blocs minés de %s"},
+            new String[]{"inventory.mined_block.count", "%s blocs minés"}
     ),
 
     ;

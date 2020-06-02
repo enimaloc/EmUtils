@@ -7,6 +7,7 @@ import ga.enimaloc.emutils.spigot.entity.EmPlayer;
 import ga.enimaloc.emutils.spigot.entity.Lang;
 import ga.enimaloc.emutils.spigot.utils.MenuUtils;
 import ga.enimaloc.emutils.spigot.utils.StringUtils;
+import net.minecraft.server.v1_15_R1.IChatBaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -15,11 +16,14 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class PlayerCommand implements CommandExecutor {
@@ -98,7 +102,7 @@ public class PlayerCommand implements CommandExecutor {
 
         gui.addElement(new DynamicGuiElement('j', () ->
                         new StaticGuiElement(
-                                'i', new ItemStack(Material.DIAMOND_PICKAXE),
+                                'j', new ItemStack(Material.DIAMOND_PICKAXE),
                                 click -> {
                                     minedBlock[0] = new InventoryGui(
                                             EmUtils.instance,
@@ -120,7 +124,7 @@ public class PlayerCommand implements CommandExecutor {
                                                         () -> new StaticGuiElement(
                                                                 'a',
                                                                 new ItemStack(m),
-                                                                "",
+                                                                " ",
                                                                 lang.get("inventory.mined_block.count", emTarget.getMinedBlockCount(m))
                                                         )
                                                 )
@@ -136,6 +140,25 @@ public class PlayerCommand implements CommandExecutor {
                         )
                 )
         );
+
+        gui.addElement(new StaticGuiElement(
+                'k',
+                new ItemStack(Material.BOOK),
+                click -> {
+                    ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
+                    BookMeta bookMeta = (BookMeta) book.getItemMeta();
+                    StringBuilder stringBuilder = new StringBuilder();
+                    String baseJson =
+                            "{\"text\":\"[%date%]\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"%command%\"}},{\"text\":\" %command%\",\"color\":\"reset\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"%command%\"}}";
+                    for (Map.Entry<Date, String> entry : emTarget.getCommandsList()) {
+                        IChatBaseComponent component = IChatBaseComponent.ChatSerializer.a(
+                                baseJson.replaceAll("%date%", StringUtils.getFormattedDate(entry.getKey()))
+                                        .replaceAll("%command%", entry.getValue())
+                        );
+                    }
+                    return true;
+                }
+        ));
 
         gui.setFiller(new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         gui.show(player);

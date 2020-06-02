@@ -19,8 +19,6 @@ public class EmUtils extends JavaPlugin {
         BUNGEE = getServer().spigot().getConfig().getConfigurationSection("settings").getBoolean("settings.bungeecord");
         this.saveDefaultConfig();
 
-        Bukkit.getConsoleSender().sendMessage("éé");
-
         this.getCommand("player").setExecutor(new PlayerCommand());
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 //        if (BUNGEE) Bukkit.getMessenger().registerIncomingPluginChannel(this, "emutils:bungee", new MessageListener());

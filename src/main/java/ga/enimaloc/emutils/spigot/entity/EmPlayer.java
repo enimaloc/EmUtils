@@ -4,21 +4,21 @@ import ga.enimaloc.emutils.spigot.Constant;
 import ga.enimaloc.emutils.spigot.utils.WebUtils;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class EmPlayer {
 
     private UUID uuid;
     private boolean premium;
     private Map<Material, Integer> minedBlocks;
+    private List<Map.Entry<Date, String>> commandsList;
 
     EmPlayer(OfflinePlayer player) {
         this.uuid = player.getUniqueId();
         this.minedBlocks = new HashMap<>();
+        this.commandsList = new ArrayList<>();
         try {
             this.premium = WebUtils.isUsernamePremium(this.uuid);
         } catch (IOException e) {
@@ -28,6 +28,8 @@ public class EmPlayer {
     }
 
     public static EmPlayer get(OfflinePlayer player) {
+        System.out.println("player = " + player);
+        System.out.println("player.getUniqueId() = " + player.getUniqueId());
         if (!Constant.emPlayers.containsKey(player.getUniqueId()))
             Constant.emPlayers.put(player.getUniqueId(), new EmPlayer(player));
         return Constant.emPlayers.get(player.getUniqueId());
@@ -84,5 +86,15 @@ public class EmPlayer {
         }*/
 
         return sortedMap;
+    }
+
+    // Command list section
+
+    public List<Map.Entry<Date, String>> getCommandsList() {
+        return commandsList;
+    }
+
+    public void addCommand(String commands) {
+        commandsList.add(new AbstractMap.SimpleEntry<>(new Date(), commands));
     }
 }
