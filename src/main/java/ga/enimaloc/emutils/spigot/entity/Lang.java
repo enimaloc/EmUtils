@@ -1,6 +1,7 @@
 package ga.enimaloc.emutils.spigot.entity;
 
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -99,10 +100,14 @@ public enum Lang {
         return String.format(m.get(key), elements);
     }
 
-    public static Lang getFromString(String lang) {
+    public static Lang getLang(String lang) {
         for (Lang value : values()) {
             if (lang.equalsIgnoreCase(value.name())) return value;
         }
         throw new IllegalArgumentException("Lang '"+lang+"' doesn't exist");
+    }
+
+    public static Lang getLang(Player player) {
+        return getLang(player.getLocale().split("_")[0]);
     }
 }

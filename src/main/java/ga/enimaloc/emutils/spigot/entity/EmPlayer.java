@@ -28,8 +28,6 @@ public class EmPlayer {
     }
 
     public static EmPlayer get(OfflinePlayer player) {
-        System.out.println("player = " + player);
-        System.out.println("player.getUniqueId() = " + player.getUniqueId());
         if (!Constant.emPlayers.containsKey(player.getUniqueId()))
             Constant.emPlayers.put(player.getUniqueId(), new EmPlayer(player));
         return Constant.emPlayers.get(player.getUniqueId());
@@ -97,4 +95,10 @@ public class EmPlayer {
     public void addCommand(String commands) {
         commandsList.add(new AbstractMap.SimpleEntry<>(new Date(), commands));
     }
+
+    // MySQL section
+
+    public void load() {}
+
+    public void save() {}
 }
