@@ -30,7 +30,7 @@ public class MenuUtils {
                             onlinePlayer.getDisplayName()));
         }
         InventoryGui gui = new InventoryGui(
-                EmUtils.instance,
+                EmUtils.getInstance(),
                 "Select player",
                 new String[]{
                         "aaaaaaaaa",

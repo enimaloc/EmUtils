@@ -1,6 +1,7 @@
 package ga.enimaloc.emutils.spigot.utils;
 
 import ga.enimaloc.emutils.spigot.EmUtils;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,9 +32,10 @@ public class StringUtils {
     }
 
     public static String getFormattedDate(Date date) {
+        FileConfiguration config = EmUtils.getInstance().getConfig();
         return new SimpleDateFormat(
-            EmUtils.instance.getConfig().contains("date-format") ?
-            EmUtils.instance.getConfig().getString("date-format") :
+            config.contains("date-format") ?
+            config.getString("date-format") :
             ""
         ).format(date);
     }

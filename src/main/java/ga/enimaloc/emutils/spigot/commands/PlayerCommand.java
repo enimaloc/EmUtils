@@ -1,14 +1,21 @@
 package ga.enimaloc.emutils.spigot.commands;
 
 import de.themoep.inventorygui.*;
+import fr.xephi.authme.api.v3.AuthMeApi;
+import fr.xephi.authme.api.v3.AuthMePlayer;
 import ga.enimaloc.emutils.spigot.Constant;
 import ga.enimaloc.emutils.spigot.EmUtils;
 import ga.enimaloc.emutils.spigot.entity.EmPlayer;
 import ga.enimaloc.emutils.spigot.entity.Lang;
 import ga.enimaloc.emutils.spigot.utils.MenuUtils;
 import ga.enimaloc.emutils.spigot.utils.StringUtils;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -17,13 +24,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class PlayerCommand implements CommandExecutor {
@@ -31,7 +36,7 @@ public class PlayerCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(Constant.prefix+ Lang.getFromString("en").get("error.need_player"));
+            sender.sendMessage(Constant.prefix+ Lang.getLang("en").get("error.need_player"));
             return true;
         }
         Player player = (Player) sender;
@@ -43,13 +48,13 @@ public class PlayerCommand implements CommandExecutor {
 
     private void display(Player player, Player target) {
         EmPlayer emTarget = EmPlayer.get(target);
-        Lang lang = Lang.getFromString(player.getLocale().split("_")[0]);
+        Lang lang = Lang.getLang(player);
 
         InventoryGui gui;
         final InventoryGui[] minedBlock = new InventoryGui[1];
 
         gui = new InventoryGui(
-                EmUtils.instance,
+                EmUtils.getInstance(),
                 lang.get("inventory.player_info", target.getDisplayName()),
                 new String[]{
                         "         ",
@@ -105,7 +110,7 @@ public class PlayerCommand implements CommandExecutor {
                                 'j', new ItemStack(Material.DIAMOND_PICKAXE),
                                 click -> {
                                     minedBlock[0] = new InventoryGui(
-                                            EmUtils.instance,
+                                            EmUtils.getInstance(),
                                             lang.get("inventory.mined_block", target.getDisplayName()),
                                             new String[]{
                                                     "aaaaaaaaa",
@@ -121,12 +126,23 @@ public class PlayerCommand implements CommandExecutor {
                                         elements.add(
                                                 new DynamicGuiElement(
                                                         'a',
-                                                        () -> new StaticGuiElement(
-                                                                'a',
-                                                                new ItemStack(m),
-                                                                " ",
-                                                                lang.get("inventory.mined_block.count", emTarget.getMinedBlockCount(m))
-                                                        )
+                                                        () -> {
+                                                            ItemStack item = new ItemStack(m);
+                                                            ItemMeta itemMeta = item.getItemMeta();
+                                                            itemMeta.setLore(
+                                                                    Collections.singletonList(
+                                                                            lang.get(
+                                                                                    "inventory.mined_block.count",
+                                                                                    emTarget.getMinedBlockCount(m)
+                                                                            )
+                                                                    )
+                                                            );
+                                                            item.setItemMeta(itemMeta);
+                                                            return new StaticGuiElement(
+                                                                    'a',
+                                                                    item
+                                                            );
+                                                        }
                                                 )
                                         );
                                     }
@@ -145,19 +161,23 @@ public class PlayerCommand implements CommandExecutor {
                 'k',
                 new ItemStack(Material.BOOK),
                 click -> {
-                    ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
-                    BookMeta bookMeta = (BookMeta) book.getItemMeta();
-                    StringBuilder stringBuilder = new StringBuilder();
-                    String baseJson =
-                            "{\"text\":\"[%date%]\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"%command%\"}},{\"text\":\" %command%\",\"color\":\"reset\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"%command%\"}}";
-                    for (Map.Entry<Date, String> entry : emTarget.getCommandsList()) {
-                        IChatBaseComponent component = IChatBaseComponent.ChatSerializer.a(
-                                baseJson.replaceAll("%date%", StringUtils.getFormattedDate(entry.getKey()))
-                                        .replaceAll("%command%", entry.getValue())
-                        );
-                    }
+//                    ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+//                    BookMeta bookMeta = (BookMeta) book.getItemMeta();
+//                    StringBuilder stringBuilder = new StringBuilder();
+//                    for (Map.Entry<Date, String> entry : emTarget.getCommandsList()) {
+//                        BaseComponent[] components =
+//                                new ComponentBuilder("[" + StringUtils.getFormattedDate(entry.getKey()) + "] ")
+//                                    .bold(true)
+//                                    .append(entry.getValue())
+//                                    .event(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, entry.getValue()))
+//                                    .create();
+//                        bookMeta.spigot().addPage(components);
+//                    }
+//                    book.setItemMeta(bookMeta);
+//                    player.openBook(book);
                     return true;
-                }
+                },
+                ChatColor.DARK_RED+"Disabled !"
         ));
 
         gui.setFiller(new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
@@ -171,7 +191,6 @@ public class PlayerCommand implements CommandExecutor {
                 else if (minedBlock[0] != null && player.getOpenInventory().getTitle().equals(minedBlock[0].getTitle()))
                     minedBlock[0].draw();
             }
-        }.runTaskTimer(EmUtils.instance, 0L, 1L);
+        }.runTaskTimer(EmUtils.getInstance(), 0L, 1L);
     }
-
 }

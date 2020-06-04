@@ -21,6 +21,8 @@ permissions:
     description: "Permission to execute /player command"
     default: op
 
+#softdepend: [AuthMe]
+
 database: true
 api-version: "1.15"
 main: ga.enimaloc.emutils.spigot.EmUtils
