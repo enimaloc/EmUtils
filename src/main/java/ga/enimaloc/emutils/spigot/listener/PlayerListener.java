@@ -20,20 +20,36 @@ public class PlayerListener implements Listener {
         this.main = main;
     }
 
+    /**
+     * Trigger when player login to the server
+     * @param event {@link PlayerLoginEvent} Event object of the event
+     */
     @EventHandler
     public void onPlayerConnect(PlayerLoginEvent event) {
         Player player = event.getPlayer();
         EmPlayer emPlayer = EmPlayer.get(player);
     }
 
+    /**
+     * Trigger when player quit to the server
+     * @param event {@link PlayerQuitEvent} Event object of the event
+     */
     @EventHandler
     public void onPlayerDisconnect(PlayerQuitEvent event) {}
 
+    /**
+     * Trigger when player break a block
+     * @param event {@link BlockBreakEvent} Event object of the event
+     */
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         EmPlayer.get(event.getPlayer()).incrementMinedBlock(event.getBlock().getType());
     }
 
+    /**
+     * Trigger before player process a command
+     * @param event {@link PlayerCommandPreprocessEvent} Event object of the event
+     */
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent event) {
         EmPlayer.get(event.getPlayer()).addCommand(event.getMessage());

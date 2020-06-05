@@ -15,6 +15,11 @@ import java.util.function.Predicate;
 
 public class MenuUtils {
 
+    /**
+     * Generate select player GUI
+     * @param player {@link Player} to display the GUI
+     * @param onClick {@link Predicate<ItemStack>} accepted when a user click on player head
+     */
     public static void selectPlayer(Player player, Predicate<ItemStack> onClick) {
         GuiElementGroup group = new GuiElementGroup('a');
         for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers()) {

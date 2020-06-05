@@ -12,15 +12,19 @@ import java.util.List;
 
 public class EmUtils extends JavaPlugin {
 
-    private static EmUtils instance;
+    /**
+     * @return instance of EmUtils class
+     */
     public static EmUtils getInstance() {
         return instance;
     }
+    private static EmUtils instance;
 
 //    public static boolean authMe;
 
-    private Connection connection;
-
+    /**
+     * Main method used by Spigot/Bukkit to run the plugin
+     */
     @Override
     public void onEnable() {
         instance = this;
@@ -46,22 +50,31 @@ public class EmUtils extends JavaPlugin {
             throwables.printStackTrace();
         }
 
-        this.getCommand("player").setExecutor(new PlayerCommand());
-        this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        // Register commands
+        this.getCommand("player").setExecutor(new PlayerCommand()); // /player
+        // Register events listener
+        this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this); // Player Listener
 
         super.onEnable();
     }
 
+    /**
+     * Used to open a mysql connection
+     * @param host hostname of the database
+     * @param port port of database
+     * @param options options of database
+     * @param database database name
+     * @param username username of connection to open
+     * @param password password of username
+     * @throws SQLException If the connection failed
+     * @throws ClassNotFoundException If the class <code>com.mysql.jdbc.Driver</code> is not found
+     */
     public void openConnection(String host, int port, String options, String database, String username, String password) throws SQLException, ClassNotFoundException {
-        if (connection != null && !connection.isClosed()) {
+        if (connection != null && !connection.isClosed()) // Connection already open
             return;
-        }
 
         synchronized (this) {
-            if (connection != null && !connection.isClosed()) {
-                return;
-            }
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.jdbc.Driver"); // Get jdbc Driver
             connection =
                     DriverManager.getConnection(
                             "jdbc:mysql://" +
@@ -70,11 +83,15 @@ public class EmUtils extends JavaPlugin {
                                     (options.isEmpty() ? "" : "?"+options),
                             username,
                             password
-                    );
+                    ); // Open connection
         }
     }
 
+    /**
+     * @return MySQL connection
+     */
     public Connection getConnection() {
         return connection;
     }
+    private Connection connection;
 }

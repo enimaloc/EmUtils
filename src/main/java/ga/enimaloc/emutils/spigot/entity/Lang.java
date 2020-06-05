@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum Lang {
+    // English language
     EN(
             new String[]{"true", "Yes"},
             new String[]{"false", "No"},
@@ -41,6 +42,7 @@ public enum Lang {
             new String[]{"inventory.mined_block", "List of mined block of %s"},
             new String[]{"inventory.mined_block.count", "Count: %s"}
     ),
+    // French language
     FR(
             new String[]{"true", "Oui"},
             new String[]{"false", "Non"},
@@ -86,6 +88,12 @@ public enum Lang {
         }
     }
 
+    /**
+     * Method without exception to try catch
+     * @param key Key of the String to get
+     * @param elements (Optional) Elements when formatting is needed
+     * @return The value corresponding to key or key if the sentence was not found
+     */
     public String get(String key, Object... elements) {
         try {
             return getE(key, elements);
@@ -95,11 +103,22 @@ public enum Lang {
         return key;
     }
 
+    /**
+     * Method with exception to try catch
+     * @param key Key of the String to get
+     * @param elements (Optional) Elements when formatting is needed
+     * @return The value corresponding to the key
+     * @throws IllegalArgumentException thrown when key is not found
+     */
     public String getE(String key, Object... elements) throws IllegalArgumentException {
         if (!m.containsKey(key)) throw new IllegalArgumentException("Key '"+key+"' doesn't exist in lang '"+this.name()+"'");
         return String.format(m.get(key), elements);
     }
 
+    /**
+     * @param lang Two first chars of the lang
+     * @return Lang object
+     */
     public static Lang getLang(String lang) {
         for (Lang value : values()) {
             if (lang.equalsIgnoreCase(value.name())) return value;
@@ -107,6 +126,10 @@ public enum Lang {
         throw new IllegalArgumentException("Lang '"+lang+"' doesn't exist");
     }
 
+    /**
+     * @param player Player to get the locale
+     * @return Lang object via {@link #getLang(String)}
+     */
     public static Lang getLang(Player player) {
         return getLang(player.getLocale().split("_")[0]);
     }

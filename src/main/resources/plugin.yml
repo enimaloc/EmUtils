@@ -23,6 +23,6 @@ permissions:
 
 #softdepend: [AuthMe]
 
-database: true
-api-version: "1.15"
-main: ga.enimaloc.emutils.spigot.EmUtils
+database: true # Plugin require database
+api-version: "1.15" #Plugin is used in 1.15
+main: ga.enimaloc.emutils.spigot.EmUtils # Main class of the plugin

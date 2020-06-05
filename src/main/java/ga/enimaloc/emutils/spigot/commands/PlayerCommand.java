@@ -33,6 +33,14 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class PlayerCommand implements CommandExecutor {
 
+    /**
+     * Executed when player execute {@code /player} command
+     * @param sender command sender, mostly is {@link Player} or {@link org.bukkit.command.ConsoleCommandSender Console}
+     * @param command command object
+     * @param label command or aliases executed
+     * @param args arguments after command
+     * @return if false return Usage reply
+     */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
@@ -46,6 +54,11 @@ public class PlayerCommand implements CommandExecutor {
         return true;
     }
 
+    /**
+     * Display GUI
+     * @param player {@link Player} to open GUI
+     * @param target {@link Player target player}
+     */
     private void display(Player player, Player target) {
         EmPlayer emTarget = EmPlayer.get(target);
         Lang lang = Lang.getLang(player);
@@ -53,6 +66,7 @@ public class PlayerCommand implements CommandExecutor {
         InventoryGui gui;
         final InventoryGui[] minedBlock = new InventoryGui[1];
 
+        // Gui setup
         gui = new InventoryGui(
                 EmUtils.getInstance(),
                 lang.get("inventory.player_info", target.getDisplayName()),
@@ -65,12 +79,21 @@ public class PlayerCommand implements CommandExecutor {
                         "         ",
                 }
         );
+
+        // Helmet slot
         gui.addElement(new DynamicGuiElement('a', () -> new StaticGuiElement('a', target.getInventory().getHelmet())));
+        // Main hand slot
         gui.addElement(new DynamicGuiElement('b', () -> new StaticGuiElement('b', target.getInventory().getItemInMainHand())));
+        // Chestplate slot
         gui.addElement(new DynamicGuiElement('c', () -> new StaticGuiElement('c', target.getInventory().getChestplate())));
+        // Other hand slot
         gui.addElement(new DynamicGuiElement('d', () -> new StaticGuiElement('d', target.getInventory().getItemInOffHand())));
+        // Leggings slot
         gui.addElement(new DynamicGuiElement('e', () -> new StaticGuiElement('e', target.getInventory().getLeggings())));
+        // Boots slot
         gui.addElement(new DynamicGuiElement('f', () -> new StaticGuiElement('f', target.getInventory().getBoots())));
+
+        // General info
         gui.addElement(new DynamicGuiElement('g', () ->
                         new StaticGuiElement(
                                 'g', new ItemStack(Material.PAPER),
@@ -85,6 +108,8 @@ public class PlayerCommand implements CommandExecutor {
                         )
                 )
         );
+
+        // XP Stats
         gui.addElement(new DynamicGuiElement('h', () ->
                         new StaticGuiElement(
                                 'h', new ItemStack(Material.EXPERIENCE_BOTTLE),
@@ -94,6 +119,8 @@ public class PlayerCommand implements CommandExecutor {
                         )
                 )
         );
+
+        // Life stats
         gui.addElement(new DynamicGuiElement('i', () ->
                         new StaticGuiElement(
                                 'i', new ItemStack(Material.APPLE),
@@ -105,6 +132,7 @@ public class PlayerCommand implements CommandExecutor {
                 )
         );
 
+        // Mined block
         gui.addElement(new DynamicGuiElement('j', () ->
                         new StaticGuiElement(
                                 'j', new ItemStack(Material.DIAMOND_PICKAXE),
@@ -157,6 +185,7 @@ public class PlayerCommand implements CommandExecutor {
                 )
         );
 
+        // Commands
         gui.addElement(new StaticGuiElement(
                 'k',
                 new ItemStack(Material.BOOK),
@@ -180,9 +209,10 @@ public class PlayerCommand implements CommandExecutor {
                 ChatColor.DARK_RED+"Disabled !"
         ));
 
-        gui.setFiller(new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
-        gui.show(player);
+        gui.setFiller(new ItemStack(Material.GRAY_STAINED_GLASS_PANE)); // Set item for empty slot
+        gui.show(player); // Open gui to player
 
+        // Update gui
         new BukkitRunnable(){
             @Override
             public void run(){
