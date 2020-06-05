@@ -12,6 +12,8 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.sql.SQLException;
+
 public class PlayerListener implements Listener {
 
     private EmUtils main;
@@ -35,7 +37,13 @@ public class PlayerListener implements Listener {
      * @param event {@link PlayerQuitEvent} Event object of the event
      */
     @EventHandler
-    public void onPlayerDisconnect(PlayerQuitEvent event) {}
+    public void onPlayerDisconnect(PlayerQuitEvent event) {
+        try {
+            EmPlayer.get(event.getPlayer()).save();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
 
     /**
      * Trigger when player break a block

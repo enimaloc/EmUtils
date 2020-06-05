@@ -1,12 +1,18 @@
 package ga.enimaloc.emutils.spigot.entity;
 
 import ga.enimaloc.emutils.spigot.Constant;
+import ga.enimaloc.emutils.spigot.EmUtils;
 import ga.enimaloc.emutils.spigot.utils.WebUtils;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
+import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 
 public class EmPlayer {
 
@@ -23,6 +29,26 @@ public class EmPlayer {
             this.premium = false;
             e.printStackTrace();
         }
+
+        // Load from database
+        try {
+            load();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        // Periodic save (Not tested)
+        long period = EmUtils.getInstance().getConfig().getLong("database.actions.save-periods") * 20L;
+        new BukkitRunnable(){
+            @Override
+            public void run(){
+                try {
+                    save();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        }.runTaskTimer(EmUtils.getInstance(), period, period);
     }
 
     /**
@@ -130,10 +156,65 @@ public class EmPlayer {
     /**
      * Used to load data from database
      */
-    public void load() {}
+    public void load() throws SQLException {
+        PreparedStatement stmt = EmUtils.getInstance().getConnection().prepareStatement("SELECT * FROM emplayers WHERE uuid = ?;");
+        stmt.setString(1, getUuid().toString());
+        ResultSet result = stmt.executeQuery();
+        if (result.next()) { // Load row
+            // Loading mined blocks
+            String minedBlock = result.getString("mined_block");
+            for (String mb : minedBlock.split(";")) {
+                String[] split = mb.split(":");
+                getMinedBlocks().put(Material.valueOf(split[0]), Integer.valueOf(split[1]));
+            }
+
+            // Loading commands
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+            String commands = result.getString("commands");
+            for (String c : commands.split(";")) {
+                String[] split = c.split("\\|");
+                try {
+                    getCommandsList().add(new AbstractMap.SimpleEntry<>(simpleDateFormat.parse(split[0]), split[1]));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else { // Create row
+            PreparedStatement statement = EmUtils.getInstance().getConnection().prepareStatement(
+                    "INSERT INTO emplayers (uuid, mined_block, commands) VALUES (?, '', '');"
+            );
+            statement.setString(1, getUuid().toString());
+            statement.execute();
+        }
+    }
 
     /**
      * Used to save data from database
      */
-    public void save() {}
+    public void save() throws SQLException {
+        Connection connection = EmUtils.getInstance().getConnection();
+        PreparedStatement stmt = connection.prepareStatement("UPDATE emplayers SET mined_block = ?, commands = ? WHERE uuid = ?;");
+        stmt.setString(1, formatMinedBlockToString());
+        stmt.setString(2, formatCommandListToString());
+        stmt.setString(3, getUuid().toString());
+        stmt.executeUpdate();
+    }
+
+    private String formatMinedBlockToString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Material material : getMinedBlocks().keySet())
+            stringBuilder.append(material.name()).append(":").append(getMinedBlockCount(material)).append(";");
+        return stringBuilder.length() == 0 ? "" : stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1);
+    }
+
+    private String formatCommandListToString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Map.Entry<Date, String> entry : getCommandsList())
+            stringBuilder
+                    .append(new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss").format(entry.getKey()))
+                    .append("|")
+                    .append(entry.getValue())
+                    .append(";");
+        return stringBuilder.length() == 0 ? "" : stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1);
+    }
 }

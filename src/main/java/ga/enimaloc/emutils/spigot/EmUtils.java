@@ -45,7 +45,8 @@ public class EmUtils extends JavaPlugin {
                     getConfig().getString("database.database"),
                     getConfig().getString("database.username"),
                     getConfig().getString("database.password")
-                    );
+                );
+            setupDatabase();
         } catch (SQLException | ClassNotFoundException throwables) {
             throwables.printStackTrace();
         }
@@ -84,6 +85,22 @@ public class EmUtils extends JavaPlugin {
                             username,
                             password
                     ); // Open connection
+        }
+    }
+
+    /**
+     * Used to create all tables
+     */
+    public void setupDatabase() throws SQLException {
+        if (getConnection().createStatement().execute(
+                "create table if not exists emPlayers(uuid varchar(36) not null, mined_block longtext null, commands longtext null);"
+        )) {
+            getConnection().createStatement().execute(
+                    "create unique index emPlayers_uuid_uindex on emPlayers (uuid);"
+            );
+            getConnection().createStatement().execute(
+                    "alter table emPlayers add constraint emPlayers_pk primary key (uuid);"
+            );
         }
     }
 

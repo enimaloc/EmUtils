@@ -52,4 +52,13 @@ database:
     #  option: "value"
     #
     # More options at https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
+    #
+    # Default:
+    #   autoReconnect: "true"
     autoReconnect: "true"
+  actions:
+    # Save period to database (in seconds)
+    # Warning with small value, server performances can be degraded
+    #
+    # Default: 60
+    save-period: 60
