@@ -1,5 +1,6 @@
 package ga.enimaloc.emutils.spigot.listener;
 
+import ga.enimaloc.emutils.spigot.Constant;
 import ga.enimaloc.emutils.spigot.EmUtils;
 import ga.enimaloc.emutils.spigot.entity.EmPlayer;
 import org.bukkit.Bukkit;
@@ -39,7 +40,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerDisconnect(PlayerQuitEvent event) {
         try {
-            EmPlayer.get(event.getPlayer()).save();
+            EmPlayer.get(event.getPlayer()).destroy();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }

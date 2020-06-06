@@ -56,9 +56,9 @@ database:
     # Default:
     #   autoReconnect: "true"
     autoReconnect: "true"
-  actions:
+  caches:
     # Save period to database (in seconds)
     # Warning with small value, server performances can be degraded
     #
-    # Default: 60
-    save-period: 60
+    # Default: 300
+    save-period: 300

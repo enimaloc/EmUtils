@@ -18,6 +18,7 @@ public class EmPlayer {
 
     private UUID uuid;
     private boolean premium;
+    private BukkitRunnable runnable;
 
     EmPlayer(OfflinePlayer player) {
         this.uuid = player.getUniqueId();
@@ -37,18 +38,19 @@ public class EmPlayer {
             throwables.printStackTrace();
         }
 
-        // Periodic save (Not tested)
-        long period = EmUtils.getInstance().getConfig().getLong("database.actions.save-periods") * 20L;
-        new BukkitRunnable(){
+        // Periodic save
+        long period = EmUtils.getInstance().getConfig().getLong("database.caches.save-period") * 20L;
+        runnable = new BukkitRunnable() {
             @Override
-            public void run(){
+            public void run() {
                 try {
                     save();
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
             }
-        }.runTaskTimer(EmUtils.getInstance(), period, period);
+        };
+        runnable.runTaskTimer(EmUtils.getInstance(), period, period);
     }
 
     /**
@@ -207,6 +209,9 @@ public class EmPlayer {
         return stringBuilder.length() == 0 ? "" : stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1);
     }
 
+    /**
+     * @return
+     */
     private String formatCommandListToString() {
         StringBuilder stringBuilder = new StringBuilder();
         for (Map.Entry<Date, String> entry : getCommandsList())
@@ -216,5 +221,15 @@ public class EmPlayer {
                     .append(entry.getValue())
                     .append(";");
         return stringBuilder.length() == 0 ? "" : stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1);
+    }
+
+    /**
+     * Trigger for deleted {@link EmPlayer} object
+     * @throws SQLException trigger when execute {@link #save()} method
+     */
+    public void destroy() throws SQLException {
+        Constant.emPlayers.remove(getUuid());
+        runnable.cancel();
+        save();
     }
 }
