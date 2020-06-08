@@ -10,14 +10,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class MenuUtils {
 
     /**
      * Generate select player GUI
-     * @param player {@link Player} to display the GUI
+     *
+     * @param player  {@link Player} to display the GUI
      * @param onClick {@link Predicate<ItemStack>} accepted when a user click on player head
      */
     public static void selectPlayer(Player player, Predicate<ItemStack> onClick) {
@@ -31,7 +31,7 @@ public class MenuUtils {
                     new StaticGuiElement(
                             'p',
                             isPH,
-                            c->onClick.test(c.getEvent().getCurrentItem()),
+                            c -> onClick.test(c.getEvent().getCurrentItem()),
                             onlinePlayer.getDisplayName()));
         }
         InventoryGui gui = new InventoryGui(

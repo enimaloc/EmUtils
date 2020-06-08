@@ -1,6 +1,5 @@
 package ga.enimaloc.emutils.spigot.entity;
 
-import ga.enimaloc.emutils.spigot.Constant;
 import ga.enimaloc.emutils.spigot.EmUtils;
 import ga.enimaloc.emutils.spigot.utils.WebUtils;
 import org.bukkit.Material;
@@ -8,17 +7,26 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.Date;
 
 public class EmPlayer {
 
-    private UUID uuid;
+    // Stock emPlayers instance for all players
+    public static Map<UUID, EmPlayer> emPlayers = new HashMap<>();
+
+    private final UUID uuid;
     private boolean premium;
-    private BukkitRunnable runnable;
+    private final BukkitRunnable runnable;
+    // Mined blocks section
+    private final Map<Material, Integer> minedBlocks;
+    // Command list section
+    private final List<Map.Entry<Date, String>> commandsList;
 
     EmPlayer(OfflinePlayer player) {
         this.uuid = player.getUniqueId();
@@ -58,9 +66,9 @@ public class EmPlayer {
      * @return get or create {@link EmPlayer} object
      */
     public static EmPlayer get(OfflinePlayer player) {
-        if (!Constant.emPlayers.containsKey(player.getUniqueId()))
-            Constant.emPlayers.put(player.getUniqueId(), new EmPlayer(player));
-        return Constant.emPlayers.get(player.getUniqueId());
+        if (!emPlayers.containsKey(player.getUniqueId()))
+            emPlayers.put(player.getUniqueId(), new EmPlayer(player));
+        return emPlayers.get(player.getUniqueId());
     }
 
     /**
@@ -76,9 +84,6 @@ public class EmPlayer {
     public boolean isPremium() {
         return premium;
     }
-
-    // Mined blocks section
-    private Map<Material, Integer> minedBlocks;
 
     /**
      * @return a {@link Map} of player mined block
@@ -104,6 +109,7 @@ public class EmPlayer {
 
     /**
      * Source: <a href="https://mkyong.com/java/how-to-sort-a-map-in-java/">mkyong.com</a>
+     *
      * @return a sorted {@link Map} of {@link Material} of mined block
      */
     public Map<Material, Integer> getSortedMinedBlocks() {
@@ -135,9 +141,6 @@ public class EmPlayer {
 
         return sortedMap;
     }
-
-    // Command list section
-    private List<Map.Entry<Date, String>> commandsList;
 
     /**
      * @return all commands execute of {@link OfflinePlayer}
@@ -225,10 +228,11 @@ public class EmPlayer {
 
     /**
      * Trigger for deleted {@link EmPlayer} object
+     *
      * @throws SQLException trigger when execute {@link #save()} method
      */
     public void destroy() throws SQLException {
-        Constant.emPlayers.remove(getUuid());
+        emPlayers.remove(getUuid());
         runnable.cancel();
         save();
     }

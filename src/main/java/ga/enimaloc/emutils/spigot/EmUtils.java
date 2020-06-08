@@ -12,15 +12,17 @@ import java.util.List;
 
 public class EmUtils extends JavaPlugin {
 
+    private static EmUtils instance;
+    private Connection connection;
+
+//    public static boolean authMe;
+
     /**
      * @return instance of EmUtils class
      */
     public static EmUtils getInstance() {
         return instance;
     }
-    private static EmUtils instance;
-
-//    public static boolean authMe;
 
     /**
      * Main method used by Spigot/Bukkit to run the plugin
@@ -36,7 +38,7 @@ public class EmUtils extends JavaPlugin {
         try {
             List<String> options = new ArrayList<>();
             for (String key : getConfig().getConfigurationSection("database.options").getKeys(false))
-                options.add(key+"="+getConfig().getString("database.options."+key));
+                options.add(key + "=" + getConfig().getString("database.options." + key));
 
             openConnection(
                     getConfig().getString("database.hostname"),
@@ -45,7 +47,7 @@ public class EmUtils extends JavaPlugin {
                     getConfig().getString("database.database"),
                     getConfig().getString("database.username"),
                     getConfig().getString("database.password")
-                );
+            );
             setupDatabase();
         } catch (SQLException | ClassNotFoundException throwables) {
             throwables.printStackTrace();
@@ -61,13 +63,14 @@ public class EmUtils extends JavaPlugin {
 
     /**
      * Used to open a mysql connection
-     * @param host hostname of the database
-     * @param port port of database
-     * @param options options of database
+     *
+     * @param host     hostname of the database
+     * @param port     port of database
+     * @param options  options of database
      * @param database database name
      * @param username username of connection to open
      * @param password password of username
-     * @throws SQLException If the connection failed
+     * @throws SQLException           If the connection failed
      * @throws ClassNotFoundException If the class <code>com.mysql.jdbc.Driver</code> is not found
      */
     public void openConnection(String host, int port, String options, String database, String username, String password) throws SQLException, ClassNotFoundException {
@@ -79,9 +82,9 @@ public class EmUtils extends JavaPlugin {
             connection =
                     DriverManager.getConnection(
                             "jdbc:mysql://" +
-                                    host+":"+port +
+                                    host + ":" + port +
                                     "/" + database +
-                                    (options.isEmpty() ? "" : "?"+options),
+                                    (options.isEmpty() ? "" : "?" + options),
                             username,
                             password
                     ); // Open connection
@@ -110,5 +113,4 @@ public class EmUtils extends JavaPlugin {
     public Connection getConnection() {
         return connection;
     }
-    private Connection connection;
 }

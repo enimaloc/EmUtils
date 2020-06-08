@@ -10,7 +10,7 @@ public class StringUtils {
 
     /**
      * @param actual actual level
-     * @param width width of bar
+     * @param width  width of bar
      * @return formatted progressbar (ex. ⬛⬛⬛⬛⬜⬜⬜⬜⬜⬜)
      */
     public static String formatProgressBar(int actual, int width) {
@@ -19,8 +19,8 @@ public class StringUtils {
 
     /**
      * @param actual actual level
-     * @param max max level (def. {@code '100'})
-     * @param width width of bar
+     * @param max    max level (def. {@code '100'})
+     * @param width  width of bar
      * @return formatted progressbar (ex. ⬛⬛⬛⬛⬜⬜⬜⬜⬜⬜)
      */
     public static String formatProgressBar(int actual, int max, int width) {
@@ -28,16 +28,16 @@ public class StringUtils {
     }
 
     /**
-     * @param actual actual level
-     * @param max max level (def. {@code '100'})
-     * @param width width of bar
-     * @param completedChar completed char (def. {@code '⬛'})
+     * @param actual          actual level
+     * @param max             max level (def. {@code '100'})
+     * @param width           width of bar
+     * @param completedChar   completed char (def. {@code '⬛'})
      * @param uncompletedChar uncompletedChar (def. {@code '⬜'})
      * @return formatted progressbar (ex. ⬛⬛⬛⬛⬜⬜⬜⬜⬜⬜)
      */
     public static String formatProgressBar(int actual, int max, int width, char completedChar, char uncompletedChar) {
         StringBuilder stringBuilder = new StringBuilder();
-        actual = Math.round((float) actual/max*width);
+        actual = Math.round((float) actual / max * width);
         max = width;
         for (int i = 0; i < width; i++) {
             if (i < actual) stringBuilder.append(completedChar);
@@ -61,9 +61,9 @@ public class StringUtils {
     public static String getFormattedDate(Date date) {
         FileConfiguration config = EmUtils.getInstance().getConfig();
         return new SimpleDateFormat(
-            config.contains("date-format") ?
-            config.getString("date-format") :
-            ""
+                config.contains("date-format") ?
+                        config.getString("date-format") :
+                        ""
         ).format(date);
     }
 

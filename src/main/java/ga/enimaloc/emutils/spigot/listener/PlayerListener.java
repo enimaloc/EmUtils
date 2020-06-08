@@ -1,9 +1,7 @@
 package ga.enimaloc.emutils.spigot.listener;
 
-import ga.enimaloc.emutils.spigot.Constant;
 import ga.enimaloc.emutils.spigot.EmUtils;
 import ga.enimaloc.emutils.spigot.entity.EmPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,13 +9,12 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.SQLException;
 
 public class PlayerListener implements Listener {
 
-    private EmUtils main;
+    private final EmUtils main;
 
     public PlayerListener(EmUtils main) {
         this.main = main;
@@ -25,6 +22,7 @@ public class PlayerListener implements Listener {
 
     /**
      * Trigger when player login to the server
+     *
      * @param event {@link PlayerLoginEvent} Event object of the event
      */
     @EventHandler
@@ -35,6 +33,7 @@ public class PlayerListener implements Listener {
 
     /**
      * Trigger when player quit to the server
+     *
      * @param event {@link PlayerQuitEvent} Event object of the event
      */
     @EventHandler
@@ -48,6 +47,7 @@ public class PlayerListener implements Listener {
 
     /**
      * Trigger when player break a block
+     *
      * @param event {@link BlockBreakEvent} Event object of the event
      */
     @EventHandler
@@ -57,6 +57,7 @@ public class PlayerListener implements Listener {
 
     /**
      * Trigger before player process a command
+     *
      * @param event {@link PlayerCommandPreprocessEvent} Event object of the event
      */
     @EventHandler

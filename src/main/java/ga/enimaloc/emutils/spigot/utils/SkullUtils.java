@@ -17,6 +17,7 @@ public class SkullUtils {
     public static ItemStack createSkull(String name, String id, String textureValue) {
         return getSkull(new ItemStack(Material.PLAYER_HEAD), name, id, textureValue);
     }
+
     public static ItemStack getSkull(ItemStack head, String name, String id, String textureValue) {
         NBTItem nbti = new NBTItem(head);
         NBTCompound skull = nbti.addCompound("SkullOwner");
