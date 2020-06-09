@@ -37,7 +37,7 @@ language: "en"
 # +--------+--------------------------------------------------+---------------------------------------+
 #
 # More info at https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
-date-format: "EEE, d MMM yyyy HH:mm:ss"
+date-format: "EEE d MMM yyyy HH:mm:ss"
 
 database:
   hostname: "localhost"

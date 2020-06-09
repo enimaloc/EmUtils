@@ -16,6 +16,11 @@ public enum Lang {
             new String[]{"error.need_player", ChatColor.DARK_RED + "You need to be a player to do that!"},
 
 
+            new String[]{"inventory.main", "EmUtils"},
+
+            new String[]{"inventory.main.player_info", "Information of players"},
+
+
             new String[]{"inventory.player_info", "Information of %s"},
 
             new String[]{"inventory.player_info.general_info", "General Info:"},
@@ -59,6 +64,11 @@ public enum Lang {
             new String[]{"false", "Non"},
 
             new String[]{"error.need_player", ChatColor.DARK_RED + "Vous devez être un joueur pour éxécuter cette commande !"},
+
+
+            new String[]{"inventory.main", "EmUtils"},
+
+            new String[]{"inventory.main.player_info", "Information des joueurs"},
 
 
             new String[]{"inventory.player_info", "Information de %s"},

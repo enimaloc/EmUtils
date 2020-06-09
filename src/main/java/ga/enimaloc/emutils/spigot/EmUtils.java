@@ -1,11 +1,13 @@
 package ga.enimaloc.emutils.spigot;
 
+import ga.enimaloc.emutils.spigot.commands.EmutilsCommand;
 import ga.enimaloc.emutils.spigot.commands.PlayerCommand;
 import ga.enimaloc.emutils.spigot.listener.PlayerListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,20 +42,25 @@ public class EmUtils extends JavaPlugin {
             for (String key : getConfig().getConfigurationSection("database.options").getKeys(false))
                 options.add(key + "=" + getConfig().getString("database.options." + key));
 
-            openConnection(
+            if (!openConnection(
                     getConfig().getString("database.hostname"),
                     getConfig().getInt("database.port"),
                     options.isEmpty() ? "" : String.join("&", options),
                     getConfig().getString("database.database"),
                     getConfig().getString("database.username"),
                     getConfig().getString("database.password")
-            );
+            )) {
+                this.getLogger().warning("No database connection found, disabling plugin.");
+                this.setEnabled(false);
+                return;
+            }
             setupDatabase();
         } catch (SQLException | ClassNotFoundException throwables) {
             throwables.printStackTrace();
         }
 
         // Register commands
+        this.getCommand("emutils").setExecutor(new EmutilsCommand()); // /emutils
         this.getCommand("player").setExecutor(new PlayerCommand()); // /player
         // Register events listener
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this); // Player Listener
@@ -73,22 +80,27 @@ public class EmUtils extends JavaPlugin {
      * @throws SQLException           If the connection failed
      * @throws ClassNotFoundException If the class <code>com.mysql.jdbc.Driver</code> is not found
      */
-    public void openConnection(String host, int port, String options, String database, String username, String password) throws SQLException, ClassNotFoundException {
+    public boolean openConnection(String host, int port, String options, String database, String username, String password) throws ClassNotFoundException, SQLException {
         if (connection != null && !connection.isClosed()) // Connection already open
-            return;
+            return true;
 
         synchronized (this) {
             Class.forName("com.mysql.jdbc.Driver"); // Get jdbc Driver
-            connection =
-                    DriverManager.getConnection(
-                            "jdbc:mysql://" +
-                                    host + ":" + port +
-                                    "/" + database +
-                                    (options.isEmpty() ? "" : "?" + options),
-                            username,
-                            password
-                    ); // Open connection
+            try {
+                connection =
+                        DriverManager.getConnection(
+                                "jdbc:mysql://" +
+                                        host + ":" + port +
+                                        "/" + database +
+                                        (options.isEmpty() ? "" : "?" + options),
+                                username,
+                                password
+                        ); // Open connection
+            } catch (SQLException e) {
+                return false;
+            }
         }
+        return true;
     }
 
     /**

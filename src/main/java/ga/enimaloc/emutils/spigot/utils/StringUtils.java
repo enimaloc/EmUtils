@@ -2,9 +2,11 @@ package ga.enimaloc.emutils.spigot.utils;
 
 import ga.enimaloc.emutils.spigot.EmUtils;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class StringUtils {
 
@@ -39,31 +41,30 @@ public class StringUtils {
         StringBuilder stringBuilder = new StringBuilder();
         actual = Math.round((float) actual / max * width);
         max = width;
-        for (int i = 0; i < width; i++) {
-            if (i < actual) stringBuilder.append(completedChar);
-            else stringBuilder.append(uncompletedChar);
-        }
+        for (int i = 0; i < width; i++) stringBuilder.append(i < actual ? completedChar : uncompletedChar);
         return stringBuilder.toString();
     }
 
     /**
-     * @param timestamp to convert into Date for format with {@link StringUtils#getFormattedDate(Date)}
+     * @param timestamp to convert into Date for format with {@link StringUtils#getFormattedDate(Date, Player)}
+     * @param player Player used for {@link Locale} can be null
      * @return Formatted {@link Date} according to field {@code date-format} config.yml
      */
-    public static String getFormattedDate(long timestamp) {
-        return getFormattedDate(new Date(timestamp));
+    public static String getFormattedDate(long timestamp, Player player) {
+        return getFormattedDate(new Date(timestamp), player);
     }
 
     /**
      * @param date to format
+     * @param player Player used for {@link Locale} can be null
      * @return Formatted {@link Date} according to field {@code date-format} config.yml
      */
-    public static String getFormattedDate(Date date) {
+    public static String getFormattedDate(Date date, Player player) {
         FileConfiguration config = EmUtils.getInstance().getConfig();
         return new SimpleDateFormat(
                 config.contains("date-format") ?
                         config.getString("date-format") :
-                        ""
+                        "", player != null ? new Locale(player.getLocale().split("_")[0]) : Locale.getDefault()
         ).format(date);
     }
 
