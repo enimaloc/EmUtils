@@ -60,7 +60,7 @@ public class StringUtils {
      * @return Formatted {@link Date} according to field {@code date-format} config.yml
      */
     public static String getFormattedDate(Date date, Player player) {
-        FileConfiguration config = EmUtils.getInstance().getConfig();
+        FileConfiguration config = EmUtils.getPlugin(EmUtils.class).getConfig();
         return new SimpleDateFormat(
                 config.contains("date-format") ?
                         config.getString("date-format") :

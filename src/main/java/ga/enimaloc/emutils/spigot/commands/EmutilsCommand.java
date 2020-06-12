@@ -28,7 +28,10 @@ public class EmutilsCommand implements CommandExecutor {
             return true;
         }
         Player player = (Player) sender;
-        MenuConstant.main(player);
+        switch (args.length) {
+            case 0: MenuConstant.main(player);
+            case 1:
+        }
         return true;
     }
 

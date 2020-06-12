@@ -1,5 +1,6 @@
 package ga.enimaloc.emutils.spigot.utils;
 
+import com.gmail.filoghost.hiddenstring.HiddenStringUtils;
 import de.themoep.inventorygui.GuiElement;
 import de.themoep.inventorygui.GuiElementGroup;
 import de.themoep.inventorygui.InventoryGui;
@@ -16,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.UUID;
 import java.util.function.Predicate;
 
 public class MenuUtils {
@@ -28,17 +30,20 @@ public class MenuUtils {
      */
     public static void selectPlayer(Player player, Predicate<ItemStack> onClick) {
         GuiElementGroup group = new GuiElementGroup('a');
-        for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers()) {
+        for (UUID uuid : EmUtils.getPlugin(EmUtils.class).getUuidCache()) {
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
             ItemStack isPH = new ItemStack(Material.PLAYER_HEAD);
             SkullMeta skullMeta = (SkullMeta) isPH.getItemMeta();
-            skullMeta.setOwningPlayer(onlinePlayer.getPlayer());
+            skullMeta.setOwningPlayer(offlinePlayer);
             isPH.setItemMeta(skullMeta);
             group.addElement(
                     new StaticGuiElement(
                             'p',
                             isPH,
                             c -> onClick.test(c.getEvent().getCurrentItem()),
-                            onlinePlayer.getDisplayName()));
+                            offlinePlayer.getName(),
+                            HiddenStringUtils.encodeString(uuid.toString())
+                    ));
         }
         MenuUtils.defaultGUI(
                 player,
@@ -57,7 +62,7 @@ public class MenuUtils {
     public static InventoryGui defaultGUI(Player player, String title, String[] rows, GuiElement... elements) {
         // Gui setup
         InventoryGui gui = new InventoryGui(
-                EmUtils.getInstance(),
+                EmUtils.getPlugin(EmUtils.class),
                 title,
                 rows,
                 elements
@@ -74,7 +79,7 @@ public class MenuUtils {
                     gui.draw();
 //                else this.cancel();
             }
-        }.runTaskTimer(EmUtils.getInstance(), 0L, 1L);
+        }.runTaskTimer(EmUtils.getPlugin(EmUtils.class), 0L, 1L);
         return gui;
     }
 }

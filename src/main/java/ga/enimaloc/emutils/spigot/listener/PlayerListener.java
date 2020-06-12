@@ -9,15 +9,20 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class PlayerListener implements Listener {
 
-    private final EmUtils main;
+    private final EmUtils emUtils;
+    private Map<UUID, BukkitRunnable> clear = new HashMap<>();
 
-    public PlayerListener(EmUtils main) {
-        this.main = main;
+    public PlayerListener(EmUtils emUtils) {
+        this.emUtils = emUtils;
     }
 
     /**
@@ -28,7 +33,8 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerConnect(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        EmPlayer emPlayer = EmPlayer.get(player);
+        if (!emUtils.getUuidCache().contains(player.getUniqueId())) emUtils.getUuidCache().add(player.getUniqueId());
+        if (clear.containsKey(player.getUniqueId())) clear.get(player.getUniqueId()).cancel();
     }
 
     /**
@@ -43,6 +49,14 @@ public class PlayerListener implements Listener {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+        if (emUtils.getConfig().getInt("caches.clear-uuid") != -1)
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    emUtils.getUuidCache().remove(event.getPlayer().getUniqueId());
+                }
+            }.runTaskLater(emUtils, emUtils.getConfig().getInt("caches.clear-uuid") * 20L);
+
     }
 
     /**

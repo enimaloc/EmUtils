@@ -6,8 +6,7 @@ author: enimaloc
 commands:
   emutils:
     description: "Open EmUtils menu"
-  player:
-    description: "View player info"
+    usage: "[player [playerName]]"
 
 permissions:
   emutils.*:

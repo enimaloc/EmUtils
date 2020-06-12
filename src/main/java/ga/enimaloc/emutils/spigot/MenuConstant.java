@@ -1,5 +1,6 @@
 package ga.enimaloc.emutils.spigot;
 
+import com.gmail.filoghost.hiddenstring.HiddenStringUtils;
 import de.themoep.inventorygui.*;
 import ga.enimaloc.emutils.spigot.entity.EmPlayer;
 import ga.enimaloc.emutils.spigot.entity.Lang;
@@ -12,13 +13,22 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public class MenuConstant {
+
+    private static String notConnected = ChatColor.DARK_GRAY.toString()+ChatColor.ITALIC.toString()+"Not connected"+ChatColor.RESET.toString();
+    private static ItemStack notConnectedItem = new ItemStack(Material.BARRIER) {{
+        ItemMeta itemMeta = getItemMeta();
+        itemMeta.setDisplayName(notConnected);
+        setItemMeta(itemMeta);
+    }};
 
     // Main GUI
     public static void main(Player player) {
@@ -39,7 +49,7 @@ public class MenuConstant {
                 new ItemStack(Material.PLAYER_HEAD),
                 click -> {
                     MenuUtils.selectPlayer(player, targetIS -> {
-                        MenuConstant.player(player, Bukkit.getPlayer(targetIS.getItemMeta().getDisplayName()));
+                        MenuConstant.player(player, Bukkit.getOfflinePlayer(UUID.fromString(HiddenStringUtils.extractHiddenString(targetIS.getItemMeta().getLore().get(0)))));
                         return true;
                     });
                     return true;
@@ -81,13 +91,13 @@ public class MenuConstant {
      * @param player {@link Player} to open GUI
      * @param target {@link Player target player}
      */
-    public static void player(Player player, Player target) {
+    public static void player(Player player, OfflinePlayer target) {
         EmPlayer emTarget = EmPlayer.get(target);
         Lang lang = Lang.getLang(player);
 
         MenuUtils.defaultGUI(
                 player,
-                lang.get("inventory.player_info", target.getDisplayName()),
+                lang.get("inventory.player_info", target.getName()),
                 new String[]{
                         "         ",
                         "gh  a  op",
@@ -117,42 +127,42 @@ public class MenuConstant {
     private static GuiElement helmet(char slot, OfflinePlayer target) {
         return new DynamicGuiElement(
                 slot,
-                () -> new StaticGuiElement(slot, target.getPlayer().getInventory().getHelmet())
+                () -> new StaticGuiElement(slot, target.isOnline() ? target.getPlayer().getInventory().getHelmet() : notConnectedItem)
         );
     } // Helmet slot
 
     private static GuiElement mainHand(char slot, OfflinePlayer target) {
         return new DynamicGuiElement(
                 slot,
-                () -> new StaticGuiElement(slot, target.getPlayer().getInventory().getItemInMainHand())
+                () -> new StaticGuiElement(slot, target.isOnline() ? target.getPlayer().getInventory().getItemInMainHand() : notConnectedItem)
         );
     } // Main hand slot
 
     private static GuiElement chestplate(char slot, OfflinePlayer target) {
         return new DynamicGuiElement(
                 slot,
-                () -> new StaticGuiElement(slot, target.getPlayer().getInventory().getChestplate())
+                () -> new StaticGuiElement(slot, target.isOnline() ? target.getPlayer().getInventory().getChestplate() : notConnectedItem)
         );
     } // Chestplate slot
 
     private static GuiElement offHand(char slot, OfflinePlayer target) {
         return new DynamicGuiElement(
                 slot,
-                () -> new StaticGuiElement(slot, target.getPlayer().getInventory().getItemInOffHand())
+                () -> new StaticGuiElement(slot, target.isOnline() ? target.getPlayer().getInventory().getItemInOffHand() : notConnectedItem)
         );
     } // Off hand slot
 
     private static GuiElement leggings(char slot, OfflinePlayer target) {
         return new DynamicGuiElement(
                 slot,
-                () -> new StaticGuiElement(slot, target.getPlayer().getInventory().getLeggings())
+                () -> new StaticGuiElement(slot, target.isOnline() ? target.getPlayer().getInventory().getLeggings() : notConnectedItem)
         );
     } // Leggings slot
 
     private static GuiElement boots(char slot, OfflinePlayer target) {
         return new DynamicGuiElement(
                 slot,
-                () -> new StaticGuiElement(slot, target.getPlayer().getInventory().getBoots())
+                () -> new StaticGuiElement(slot, target.isOnline() ? target.getPlayer().getInventory().getBoots() : notConnectedItem)
         );
     } // Boots slot
 
@@ -161,8 +171,8 @@ public class MenuConstant {
                 new StaticGuiElement(
                         slot, new ItemStack(Material.PAPER),
                         lang.get("inventory.player_info.general_info"),
-                        lang.get("inventory.player_info.general_info.hostname", target.getPlayer().getAddress().getAddress().getHostAddress()),
-                        lang.get("inventory.player_info.general_info.locale", target.getPlayer().getLocale()),
+                        lang.get("inventory.player_info.general_info.hostname", target.isOnline() ? target.getPlayer().getAddress().getAddress().getHostAddress() : notConnected),
+                        lang.get("inventory.player_info.general_info.locale", target.isOnline() ? target.getPlayer().getLocale() : notConnected),
                         lang.get("inventory.player_info.general_info.first_played", StringUtils.getFormattedDate(target.getFirstPlayed(), player)),
                         lang.get("inventory.player_info.general_info.premium", lang.get("" + emTarget.isPremium())),
                         lang.get("inventory.player_info.general_info.online", lang.get("" + target.isOnline())),
@@ -177,8 +187,8 @@ public class MenuConstant {
                 new StaticGuiElement(
                         slot, new ItemStack(Material.EXPERIENCE_BOTTLE),
                         lang.get("inventory.player_info.xp_stats"),
-                        lang.get("inventory.player_info.xp_stats.level", target.getPlayer().getLevel()),
-                        StringUtils.formatProgressBar(Math.round(target.getPlayer().getExp() * 100), 18) + " " + Math.round(target.getPlayer().getExp() * 100) + "%"
+                        lang.get("inventory.player_info.xp_stats.level", target.isOnline() ? target.getPlayer().getLevel() : notConnected),
+                        target.isOnline() ? StringUtils.formatProgressBar(Math.round(target.getPlayer().getExp() * 100), 18) + " " + Math.round(target.getPlayer().getExp() * 100) + "%" : StringUtils.formatProgressBar(0, 18) + " "+notConnected+"%"
                 )
         );
     }
@@ -188,9 +198,9 @@ public class MenuConstant {
                 new StaticGuiElement(
                         slot, new ItemStack(Material.APPLE),
                         lang.get("inventory.player_info.life_stats"),
-                        lang.get("inventory.player_info.life_stats.health", target.getPlayer().getHealth() / 2 + "/" + target.getPlayer().getHealthScale() / 2),
-                        lang.get("inventory.player_info.life_stats.food", target.getPlayer().getFoodLevel()),
-                        lang.get("inventory.player_info.life_stats.saturation", target.getPlayer().getSaturation())
+                        lang.get("inventory.player_info.life_stats.health", target.isOnline() ? target.getPlayer().getHealth() / 2 + "/" + target.getPlayer().getHealthScale() / 2 : notConnected),
+                        lang.get("inventory.player_info.life_stats.food", target.isOnline() ? target.getPlayer().getFoodLevel() : notConnected),
+                        lang.get("inventory.player_info.life_stats.saturation", target.isOnline() ? target.getPlayer().getSaturation() : notConnected)
                 )
         );
     }
@@ -201,15 +211,15 @@ public class MenuConstant {
                         slot,
                         new ItemStack(Material.COMPASS),
                         lang.get("inventory.player_info.position"),
-                        lang.get("inventory.player_info.position.x", target.getPlayer().getLocation().getX()),
-                        lang.get("inventory.player_info.position.y", target.getPlayer().getLocation().getY()),
-                        lang.get("inventory.player_info.position.z", target.getPlayer().getLocation().getZ()),
-                        lang.get("inventory.player_info.position.yaw", target.getPlayer().getLocation().getYaw()),
-                        lang.get("inventory.player_info.position.pitch", target.getPlayer().getLocation().getPitch()),
-                        lang.get("inventory.player_info.position.target.distance", target.getPlayer().getCompassTarget().distance(target.getPlayer().getLocation())),
-                        lang.get("inventory.player_info.position.target.x", target.getPlayer().getCompassTarget().getX()),
-                        lang.get("inventory.player_info.position.target.y", target.getPlayer().getCompassTarget().getY()),
-                        lang.get("inventory.player_info.position.target.z", target.getPlayer().getCompassTarget().getZ())
+                        lang.get("inventory.player_info.position.x", target.isOnline() ? target.getPlayer().getLocation().getX() : notConnected),
+                        lang.get("inventory.player_info.position.y", target.isOnline() ? target.getPlayer().getLocation().getY() : notConnected),
+                        lang.get("inventory.player_info.position.z", target.isOnline() ? target.getPlayer().getLocation().getZ() : notConnected),
+                        lang.get("inventory.player_info.position.yaw", target.isOnline() ? target.getPlayer().getLocation().getYaw() : notConnected),
+                        lang.get("inventory.player_info.position.pitch", target.isOnline() ? target.getPlayer().getLocation().getPitch() : notConnected),
+                        lang.get("inventory.player_info.position.target.distance", target.isOnline() ? target.getPlayer().getCompassTarget().distance(target.getPlayer().getLocation()) : notConnected),
+                        lang.get("inventory.player_info.position.target.x", target.isOnline() ? target.getPlayer().getCompassTarget().getX() : notConnected),
+                        lang.get("inventory.player_info.position.target.y", target.isOnline() ? target.getPlayer().getCompassTarget().getY() : notConnected),
+                        lang.get("inventory.player_info.position.target.z", target.isOnline() ? target.getPlayer().getCompassTarget().getZ() : notConnected)
                 ));
     }
 
@@ -219,7 +229,7 @@ public class MenuConstant {
                         slot, new ItemStack(Material.DIAMOND_PICKAXE),
                         click -> {
                             InventoryGui minedBlock = new InventoryGui(
-                                    EmUtils.getInstance(),
+                                    EmUtils.getPlugin(EmUtils.class),
                                     lang.get("inventory.mined_block", target.getName()),
                                     new String[]{
                                             "aaaaaaaaa",
@@ -266,7 +276,7 @@ public class MenuConstant {
                                         minedBlock.draw();
                                     else this.cancel();
                                 }
-                            }.runTaskTimer(EmUtils.getInstance(), 0L, 1L);
+                            }.runTaskTimer(EmUtils.getPlugin(EmUtils.class), 0L, 1L);
 
                             return true;
                         },

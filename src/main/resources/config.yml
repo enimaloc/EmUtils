@@ -56,9 +56,18 @@ database:
     # Default:
     #   autoReconnect: "true"
     autoReconnect: "true"
-  caches:
-    # Save period to database (in seconds)
-    # Warning with small value, server performances can be degraded
-    #
-    # Default: 300
-    save-period: 300
+
+caches:
+  # Save period to database (in seconds)
+  # Warning with small value, server performances can be degraded
+  #
+  # Default: 300
+  save-period: 300
+
+  # Clear UUID cache after x seconds
+  # Cache used in command to get player when is offline
+  # 0: no uuid cache
+  # -1: no clear
+  #
+  # Default: 86400
+  clear-uuid: 86400

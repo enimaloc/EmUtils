@@ -1,37 +1,31 @@
 package ga.enimaloc.emutils.spigot;
 
 import ga.enimaloc.emutils.spigot.commands.EmutilsCommand;
-import ga.enimaloc.emutils.spigot.commands.PlayerCommand;
+import ga.enimaloc.emutils.spigot.commands.EmutilsCommandTabCompleter;
 import ga.enimaloc.emutils.spigot.listener.PlayerListener;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class EmUtils extends JavaPlugin {
 
-    private static EmUtils instance;
     private Connection connection;
+    private List<UUID> uuidCache;
 
 //    public static boolean authMe;
-
-    /**
-     * @return instance of EmUtils class
-     */
-    public static EmUtils getInstance() {
-        return instance;
-    }
 
     /**
      * Main method used by Spigot/Bukkit to run the plugin
      */
     @Override
     public void onEnable() {
-        instance = this;
+        uuidCache = new ArrayList<>();
         this.saveDefaultConfig();
 
 //        if (authMe = (this.getServer().getPluginManager().isPluginEnabled("AuthMe")
@@ -51,7 +45,7 @@ public class EmUtils extends JavaPlugin {
                     getConfig().getString("database.password")
             )) {
                 this.getLogger().warning("No database connection found, disabling plugin.");
-                this.setEnabled(false);
+                this.getServer().getPluginManager().disablePlugin(this);
                 return;
             }
             setupDatabase();
@@ -60,8 +54,9 @@ public class EmUtils extends JavaPlugin {
         }
 
         // Register commands
-        this.getCommand("emutils").setExecutor(new EmutilsCommand()); // /emutils
-        this.getCommand("player").setExecutor(new PlayerCommand()); // /player
+        PluginCommand emutilsCommand = this.getCommand("emutils");
+        emutilsCommand.setExecutor(new EmutilsCommand()); // /emutils
+        emutilsCommand.setTabCompleter(new EmutilsCommandTabCompleter());
         // Register events listener
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this); // Player Listener
 
@@ -125,4 +120,12 @@ public class EmUtils extends JavaPlugin {
     public Connection getConnection() {
         return connection;
     }
+
+    /**
+     * @return all UUID connected until <code>caches.clear-uuid</code> seconds after disconnection
+     */
+    public List<UUID> getUuidCache() {
+        return uuidCache;
+    }
+
 }
