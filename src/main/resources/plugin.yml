@@ -4,23 +4,17 @@ description: "Emutils add multiple functionality to Minecraft"
 author: enimaloc
 
 commands:
-  player:
-    description: "View player info"
-    permission: emutils.player
-    permission-message: "You don't have the permission to execute this command"
-    usage: "Correct usage: /<command> <player>"
+  emutils:
+    description: "Open EmUtils menu"
+    usage: "[player [playerName]]"
 
 permissions:
   emutils.*:
     description: "Wildcard permission"
     default: op
-    children:
-      - emutils.player
 
-  emutils.player:
-    description: "Permission to execute /player command"
-    default: op
+#softdepend: [AuthMe]
 
-database: true
-api-version: "1.15"
-main: ga.enimaloc.emutils.spigot.EmUtils
+database: true # Plugin require database
+api-version: "1.15" #Plugin is used in 1.15
+main: ga.enimaloc.emutils.spigot.EmUtils # Main class of the plugin

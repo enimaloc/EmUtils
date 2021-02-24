@@ -2,64 +2,81 @@ package ga.enimaloc.emutils.spigot.listener;
 
 import ga.enimaloc.emutils.spigot.EmUtils;
 import ga.enimaloc.emutils.spigot.entity.EmPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 public class PlayerListener implements Listener {
 
-    private EmUtils main;
+    private final EmUtils emUtils;
+    private Map<UUID, BukkitRunnable> clear = new HashMap<>();
 
-    public PlayerListener(EmUtils main) {
-        this.main = main;
+    public PlayerListener(EmUtils emUtils) {
+        this.emUtils = emUtils;
     }
 
+    /**
+     * Trigger when player login to the server
+     *
+     * @param event {@link PlayerLoginEvent} Event object of the event
+     */
     @EventHandler
     public void onPlayerConnect(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        EmPlayer emPlayer = EmPlayer.get(player);
-        System.out.println("emPlayer = " + emPlayer.toString());
-        System.out.println("player = " + player);
-        System.out.println("player.getAddress() = " + player.getAddress());
-        System.out.println("player.getDisplayName() = " + player.getDisplayName());
-        System.out.println("player.getAllowFlight() = " + player.getAllowFlight());
-        System.out.println("player.getClientViewDistance() = " + player.getClientViewDistance());
-        System.out.println("player.getCompassTarget() = " + player.getCompassTarget());
-        System.out.println("player.getExhaustion() = " + player.getExhaustion());
-        System.out.println("player.getExp() = " + player.getExp());
-        System.out.println("player.getFlySpeed() = " + player.getFlySpeed());
-        System.out.println("player.getFoodLevel() = " + player.getFoodLevel());
-        System.out.println("player.getHealthScale() = " + player.getHealthScale());
-        System.out.println("player.getLevel() = " + player.getLevel());
-        System.out.println("player.getLocale() = " + player.getLocale());
-        System.out.println("player.getPlayerListFooter() = " + player.getPlayerListFooter());
-        System.out.println("player.getPlayerListHeader() = " + player.getPlayerListHeader());
-        System.out.println("player.getPlayerListName() = " + player.getPlayerListName());
-        System.out.println("player.getPlayerTime() = " + player.getPlayerTime());
-        System.out.println("player.getPlayerTimeOffset() = " + player.getPlayerTimeOffset());
-        System.out.println("player.getPlayerWeather() = " + player.getPlayerWeather());
-        System.out.println("player.getSaturation() = " + player.getSaturation());
-        System.out.println("player.getTotalExperience() = " + player.getTotalExperience());
-        System.out.println("player.getWalkSpeed() = " + player.getWalkSpeed());
-        System.out.println("player.isFlying() = " + player.isFlying());
-        System.out.println("player.isHealthScaled() = " + player.isHealthScaled());
-        System.out.println("player.isPlayerTimeRelative() = " + player.isPlayerTimeRelative());
-        System.out.println("player.isSleepingIgnored() = " + player.isSleepingIgnored());
-        System.out.println("player.isSneaking() = " + player.isSneaking());
-        System.out.println("player.isSprinting() = " + player.isSprinting());
+        if (!emUtils.getUuidCache().contains(player.getUniqueId())) emUtils.getUuidCache().add(player.getUniqueId());
+        if (clear.containsKey(player.getUniqueId())) clear.get(player.getUniqueId()).cancel();
     }
 
+    /**
+     * Trigger when player quit to the server
+     *
+     * @param event {@link PlayerQuitEvent} Event object of the event
+     */
     @EventHandler
-    public void onPlayerDisconnect(PlayerQuitEvent event) {}
+    public void onPlayerDisconnect(PlayerQuitEvent event) {
+        try {
+            EmPlayer.get(event.getPlayer()).destroy();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        if (emUtils.getConfig().getInt("caches.clear-uuid") != -1)
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    emUtils.getUuidCache().remove(event.getPlayer().getUniqueId());
+                }
+            }.runTaskLater(emUtils, emUtils.getConfig().getInt("caches.clear-uuid") * 20L);
 
+    }
+
+    /**
+     * Trigger when player break a block
+     *
+     * @param event {@link BlockBreakEvent} Event object of the event
+     */
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         EmPlayer.get(event.getPlayer()).incrementMinedBlock(event.getBlock().getType());
+    }
+
+    /**
+     * Trigger before player process a command
+     *
+     * @param event {@link PlayerCommandPreprocessEvent} Event object of the event
+     */
+    @EventHandler
+    public void onCommand(PlayerCommandPreprocessEvent event) {
+        EmPlayer.get(event.getPlayer()).addCommand(event.getMessage());
     }
 
 }

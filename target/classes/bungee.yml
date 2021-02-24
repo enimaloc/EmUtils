@@ -1,6 +1,0 @@
-name: EmUtils
-version: 0.0.1
-description: "Emutils add multiple functionality to Minecraft"
-author: enimaloc
-
-main: ga.enimaloc.emutils.bungee.EmUtils

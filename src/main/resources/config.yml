@@ -37,4 +37,37 @@ language: "en"
 # +--------+--------------------------------------------------+---------------------------------------+
 #
 # More info at https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
-date-format: "EEE, d MMM yyyy HH:mm:ss"
+date-format: "EEE d MMM yyyy HH:mm:ss"
+
+database:
+  hostname: "localhost"
+  port: 3306
+  database: ""
+  username: ""
+  password: ""
+  options:
+    # Format
+    #  option=value
+    # be
+    #  option: "value"
+    #
+    # More options at https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
+    #
+    # Default:
+    #   autoReconnect: "true"
+    autoReconnect: "true"
+
+caches:
+  # Save period to database (in seconds)
+  # Warning with small value, server performances can be degraded
+  #
+  # Default: 300
+  save-period: 300
+
+  # Clear UUID cache after x seconds
+  # Cache used in command to get player when is offline
+  # 0: no uuid cache
+  # -1: no clear
+  #
+  # Default: 86400
+  clear-uuid: 86400
